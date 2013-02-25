@@ -2,3 +2,4 @@
 
 require ::File.expand_path('../config/environment',  __FILE__)
 run ProjectMonitor::Application
+sass_options = {:debug_info => true}

@@ -2,3 +2,9 @@
  *= require manage_projects
  *= require dashboard
  */
+
+body {
+  background: #2A271F;
+  
+}
+

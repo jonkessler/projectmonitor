@@ -23,7 +23,7 @@ a:hover {
 #header {
   margin: 0;
   padding: .8em 1em;
-  background-color: #88C2E5;
+  background-color: #e5e5e5;
 }
 
 #header .company_logo {
@@ -111,7 +111,10 @@ Form Errors
 
 table.projects {
   border-collapse: collapse;
-  margin: 15px 0 40px 0;
+  margin: 15px 0 140px 0;
+  width: 100%;
+  max-width: 1400px;
+  
 }
 
 table.projects tr th {
@@ -125,7 +128,7 @@ table.projects th {
 }
 
 table.projects tr td {
-  padding: 5px 15px;
+  padding: 8px 12px;
   border-bottom: 1px solid #ddd;
 }
 
@@ -133,26 +136,29 @@ table.projects tr.odd td {
   background-color: #eee;
 }
 
+table.projects tr td:first-child {
+  font-size: 1.5em;
+  font-weight: 600; 
+}
+
+
 table.projects td.actions * {
   margin-right: 10px;
 }
 
 .button,
 a:link.button {
-  background:#2B4C74;
-  padding: 2px 5px;
-  font-size: 12px;
+  background: $very-dark-green;
+  padding: 7px 15px;
+  font-size: 13px;
   color: #eeeeee;
   text-decoration:none;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
-  border-radius: 3px;
+  border-radius: 4px;
   display:table-inline;
   font-weight:bold;
   letter-spacing: 1px;
-  box-shadow: 0 0 0 1px #3B6692, 0 0 0 2px #444;
-  -moz-box-shadow: 0 0 0 1px #3B6692, 0 0 0 2px #444;
-  -webkit-shadow: 0 0 0 1px #3B6692, 0 0 0 2px #444;
 }
 
 .button:hover,
@@ -219,7 +225,9 @@ form {
 }
 
 .projects.index {
- h1 { margin-bottom: 10px; }
+ h1 { 
+   margin-bottom: 10px;
+   }
 }
 
 .projects.edit, .projects.new {
@@ -240,3 +248,35 @@ form {
     color: $very-dark-green;
   }
 }
+
+tr {
+  height: 50px;
+}
+
+tr:first-child {
+  height: 25px;
+}
+
+
+tr.even {
+  color: $very-light-grey;
+}
+
+table.projects tr td {
+  padding: 7px 15px;
+}
+
+table.projects tr th {
+  color: $very-light-grey;
+  font-size: 1.125em;
+}
+
+.configuration {
+  h1, p {
+    color: $very-light-grey;
+  }
+  h1 {
+    margin-top: 1.25em;
+  }
+}
+

@@ -1,6 +1,6 @@
 %h1== Projects #{link_to 'Add Project +', new_project_path, :class => "button add_button"}
 %br
-== Filter by Tag #{select_tag(:tag, options_for_select(@tags.insert(0, '')))}
+%p== Filter by Tag #{select_tag(:tag, options_for_select(@tags.insert(0, '')))}
 
 = hidden_field_tag(:current_tag, params[:tags])
 %table.projects
