@@ -35,7 +35,7 @@ GEM
     activesupport (3.2.13)
       i18n (= 0.6.1)
       multi_json (~> 1.0)
-    addressable (2.3.2)
+    addressable (2.3.3)
     airbrake (3.1.8)
       activesupport
       builder
@@ -127,7 +127,7 @@ GEM
     em-socksify (0.2.1)
       eventmachine (>= 1.0.0.beta.4)
     erubis (2.7.0)
-    eventmachine (1.0.0.rc.4)
+    eventmachine (1.0.3)
     excon (0.16.10)
     execjs (1.4.0)
       multi_json (~> 1.0)
@@ -381,7 +381,7 @@ DEPENDENCIES
   draper (< 0.13)
   dynamic_form
   eco
-  em-http-request (>= 1.0.0.beta.4)
+  em-http-request
   eventmachine
   factory_girl_rails
   fakeweb
