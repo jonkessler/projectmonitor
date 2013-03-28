@@ -1,46 +1,87 @@
-require 'net/http'
-require 'net/https'
+require 'fiber'
 
 class UrlRetriever
-  def initialize(url, username = nil, password = nil, verify_ssl = true)
+  def initialize(url, options = {})
+    # Options: { verify_ssl: BOOL, username: str, password: str}
+    @options = options
     @url = url
-    @username = username
-    @password = password
-    @verify_ssl = verify_ssl
+    @callbacks = []
+    @errbacks = []
+  end
+
+  def _run_in_reactor(&block)
+    # EM already running.
+    if EM.reactor_running?
+      if block_given?
+        Fiber.new { yield }.resume
+      else
+        Fiber.new { block.call }.resume
+      end
+
+    # EM not running.
+    else
+      if block_given?
+        Fiber.new { EM.run(nil) { yield } }.resume
+      else
+        Fiber.new { EM.run(Proc.new { block.call }) }.resume
+      end
+
+    end
+  end
+
+  def _http
+    # Event machine options object
+    _options = {
+      redirects: 5,
+      connect_timeout: 30,
+      inactivity_timeout: 30,
+      ssl: { verify_peer: @options['verify_ssl'] },
+      head: {'authorization' => [@options['username'], @options['password']]}
+    }
+    _options.delete_if { |key,value| !value.present? }
+    @http_request = EM::HttpRequest.new uri.to_s, _options
   end
 
   def get
-    get_request = Net::HTTP::Get.new "#{uri.path}?#{uri.query}"
-    yield get_request if block_given?
-    http.request(get_request)
-  rescue Errno::ECONNREFUSED
-    raise Net::HTTPError.new("Error: Could not connect to the remote server", nil)
+    _run_in_reactor { _http.get }
   end
 
-  def http
-    Net::HTTP.new(uri.host, uri.port).tap do |http|
-      if uri.scheme == 'https'
-        http.use_ssl = true
-        if @verify_ssl
-          http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        else
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        end
-        http.ca_file = Rails.root.join(ConfigHelper.get(:certificate_bundle)).to_s
+  def poll(period)
+    _run_in_reactor do
+      EM.add_periodic_timer(period) do
+        _http.get
       end
-      http.read_timeout = 30
-      http.open_timeout = 30
     end
   end
 
   def retrieve_content
-    response = if @username.present? && @password.present?
-                 get { |get_request| get_request.basic_auth(@username, @password) }
-               else
-                 get
-               end
+    result = nil
+    _run_in_reactor do
+      req = _http.get
+      req.callback { result = req.response; Fiber.yield }
+      req.errback { throw "Error #{req.status}"; Fiber.yield }
+    end
+    return result
+  end
 
-    process_response response
+  def _errback
+    @errbacks.each { |block| block(@http_request) }
+  end
+
+  def _callback
+    @callbacks.each { |block| block(@http_request) }
+  end
+
+  def errback(&block)
+    @errbacks << block
+  end
+
+  def callback(&block)
+    @callbacks << block
+  end
+
+  def stop
+    @callbacks = {}
   end
 
   def uri
@@ -51,17 +92,6 @@ class UrlRetriever
     end
   end
 
-  private
+  private :_run_in_reactor, :_http
 
-  def process_response(response)
-    case response.code.to_i
-      when 200..299
-        response.body
-      when 300..399
-        UrlRetriever.new(response.header['location'], @username, @password, @verify_ssl).retrieve_content
-      # when 400..599
-      else
-        raise Net::HTTPError.new("Got #{response.code} response status from #{@url}, body = '#{response.body}'", nil)
-    end
-  end
 end
