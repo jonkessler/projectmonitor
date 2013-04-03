@@ -6,6 +6,7 @@
     = javascript_include_tag "application"
     = csrf_meta_tag
     %script{:src => "http://fast.fonts.com/jsapi/14aea2b8-37b7-4a31-afb9-e44414bef419.js", :type => "text/javascript"}
+    %meta{"http-equiv" => "refresh", :content => "15;URL='http://dashboards.local:12345/'"}
   %body{:class => "dashboard tiles_#{@tiles_count}", "data-tiles-count" => @tiles_count}
     = yield
     #footer
